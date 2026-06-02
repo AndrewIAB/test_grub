@@ -14,9 +14,9 @@ size_t strlen(const char* str) {
 }
 
 const char* struint(unsigned int a) {
+	char* out = &(strtemp[sizeof(strtemp) - 1]);
 	strtemp[sizeof(strtemp) - 1] = 0;
 	
-	char* out = &(strtemp[sizeof(strtemp) - 1]);
 	do {
 		out--;
 		(*out) = '0' + (a % 10);
@@ -27,14 +27,13 @@ const char* struint(unsigned int a) {
 }
 
 const char* struint_hex(unsigned int a, int length) {
-	strtemp[sizeof(strtemp) - 1] = 0;
-	
 	char* out = &(strtemp[sizeof(strtemp) - 1]);
 	int i;
-	int b;
+	strtemp[sizeof(strtemp) - 1] = 0;
+	
 	for (i = 0; i < length; i++) {
+		register int b = a % 16;
 		out--;
-		b = a % 16;
 		if (b < 10) {
 			(*out) = '0' + b;
 		} else {
@@ -47,10 +46,10 @@ const char* struint_hex(unsigned int a, int length) {
 }
 
 const char* struint_bin(unsigned int a, int length) {
-	strtemp[sizeof(strtemp) - 1] = 0;
-	
 	char* out = &(strtemp[sizeof(strtemp) - 1]);
 	int i;
+	strtemp[sizeof(strtemp) - 1] = 0;
+	
 	for (i = 0; i < length; i++) {
 		out--;
 		(*out) = '0' + (a % 2);

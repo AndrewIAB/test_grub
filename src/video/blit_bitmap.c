@@ -11,28 +11,29 @@
 void* memcpy(void* dest, const void* src, size_t len);
 void* memset (void *dest, register int val, register size_t len);
 
+/* From the bottom of my heart I hate this code and hope to refactor it soon */
 void blit_bitmap(int x, int y, bitmap_t* bitmap, int scale) {
 	const video_params_t* params = video_get_params();
-
-	const int x_i = x;
-
-	const uint8_t* src = bitmap->src + bitmap->len - 1;
-
-	int bits = bitmap->len * 8;
-	bits -= bits % bitmap->width;
+	const uint8_t* src = (uint8_t*)bitmap->src + bitmap->len - 1;
 	unsigned char mask = *src;
 
+	const int x_i = x;
+	int bits = bitmap->len * 8;
+	bits -= bits % bitmap->width;
+
 	while (bits && y <= params->height) {
-		void* framebuffer = params->framebuffer;
+		char* framebuffer = params->framebuffer;
 		framebuffer += (size_t)(x * params->depth + y * params->pitch);
 
 		unsigned int color = (mask & 128) ? (~0) : (0xff0000);
 
+		/* Avoid overdraw if scaled pixel goes just over border of screen */
 		int rem_pixels_y = params->height - y;
 		int scale_pixels_y = MIN(rem_pixels_y, scale);
 		int rem_pixels_x = params->width - x;
 		int scale_pixels_x = MIN(rem_pixels_x, scale);
 
+		/* Draw scaled pixel */
 		for (int i = 0; i < scale_pixels_y; i++) {
 			for (int j = 0; j < scale_pixels_x; j++) {
 				memcpy(framebuffer + i * params->pitch + j * params->depth, &color, params->depth);

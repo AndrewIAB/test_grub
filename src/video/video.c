@@ -19,8 +19,8 @@ const video_params_t* video_get_params() {
 void video_multiboot_init(const multiboot_info_t* multiboot_info) {
 	bool fbf_info = (multiboot_info->flags & MULTIBOOT_INFO_FRAMEBUFFER_INFO) != 0;
 
-	// Bootloader provides NO framebuffer
-	// Assume base VGA text mode
+	/* Bootloader provides NO framebuffer
+	 * Assume base VGA text mode */
 	if (!fbf_info) {
 		video_params.width = 80;
 		video_params.height = 25;
@@ -31,7 +31,7 @@ void video_multiboot_init(const multiboot_info_t* multiboot_info) {
 		return;
 	}
 
-	// Gather actual values from multiboot header
+	/* Gather actual values from multiboot header */
 
 	switch (multiboot_info->framebuffer_type) {
 		case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
