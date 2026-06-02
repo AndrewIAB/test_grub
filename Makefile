@@ -70,15 +70,6 @@ disk.img: bin/os grub.cfg
 	sudo losetup -d $$(cat diskloop)
 	rm mnt -r
 
-#	cp grub.cfg disk_fs/boot/grub
-#	cp bin/os disk_fs/boot/
-#	sudo virt-make-fs --type=ext2 --size=$(DISK_SIZE) --blocksize=$(SECT_SIZE) --partition=gpt disk_fs disk.img
-
-#	mkdir mnt
-#	diskimgloop=$$(sudo losetup -f --show disk.img)
-#	sudo mount $$diskimgloop mnt
-#	sudo grub-install 
-
 bin/os: bin/boot.so $(OBJ_FILES)
 	$(CC) -T linker.ld -o $@ $^ $(CARGS) -Wl,--orphan-handling=error -lgcc
 
