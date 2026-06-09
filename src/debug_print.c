@@ -5,6 +5,10 @@
 #include "video/bitmap_font.h"
 #include "debug_print.h"
 
+/*
+ * Used by debug_print_set_color to search for standard EGA color from palette,
+ * primarily so the BMP and TTY modes look roughly the same
+ */
 static const uint8_t VGA_COLORS[16][3] = {
 	{0x00, 0x00, 0x00},
 	{0x00, 0x00, 0xAA},
@@ -31,14 +35,17 @@ void blit_bitmap(int x, int y, const bitmap_t* bitmap, int scale);
 extern video_color_t blit_bitmap_fg;
 extern video_color_t blit_bitmap_bg;
 
+/* All could be modified for smaller terminal than what's detected for the screen size. */
 size_t debug_print_columns;
 size_t debug_print_rows;
 size_t debug_print_index;
 
+/* For setting character colors in both BMP and TTY modes */
 uint8_t debug_print_tty_style;
 video_color_t debug_print_bmp_fg;
 video_color_t debug_print_bmp_bg;
 
+/* Detected color palette */
 video_color_t debug_print_bmp_colors[16];
 
 //int debug_print_bmp_spacing = 2;
@@ -70,7 +77,11 @@ void debug_print_init() {
 		debug_putchar = debug_putchar_bmp;
 		debug_print = debug_print_bmp;
 
-		for (int i = 0; i < 16; i++);
+		/* Set palette */
+		for (int i = 0; i < 16; i++) {
+			const uint8_t* color = VGA_COLORS[i];
+			debug_print_bmp_colors[i] = get_color(color[0], color[1], color[2]);
+		}
 	}
 
 	debug_print_set_color(0x0F);
@@ -81,10 +92,8 @@ void debug_print_set_color(uint8_t color) {
 		debug_print_tty_style = color;
 	}
 	else {
-		const uint8_t* fg = VGA_COLORS[color & 0xF];
-		const uint8_t* bg = VGA_COLORS[color >> 4];
-		debug_print_bmp_fg = get_color(fg[0], fg[1], fg[2]);
-		debug_print_bmp_bg = get_color(bg[0], bg[1], bg[2]);
+		debug_print_bmp_fg = debug_print_bmp_colors[color & 0xF];
+		debug_print_bmp_bg = debug_print_bmp_colors[color >> 4];
 	}
 }
 
@@ -154,7 +163,7 @@ void debug_ins_bmp(char c) {
 	int y = (debug_print_index / debug_print_columns) * bitmap_font_height + debug_print_bmp_margin;
 	blit_bitmap_fg = debug_print_bmp_fg;
 	blit_bitmap_bg = debug_print_bmp_bg;
-	blit_bitmap(x, y, &(bitmap_font[c]), 1);
+	blit_bitmap(x, y, &(bitmap_font[*(uint8_t*)(&c)]), 1);
 }
 
 void debug_putchar_bmp(char c) {
