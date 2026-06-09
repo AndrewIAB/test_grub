@@ -11,10 +11,12 @@
 void* memcpy(void* dest, const void* src, size_t len);
 void* memset (void *dest, register int val, register size_t len);
 
+video_color_t blit_bitmap_fg;
+video_color_t blit_bitmap_bg;
+
 /* From the bottom of my heart I hate this code and hope to refactor it soon */
-void blit_bitmap(int x, int y, bitmap_t* bitmap, int scale) {
-	const video_params_t* params = video_get_params();
-	const uint8_t* src = (uint8_t*)bitmap->src + bitmap->len - 1;
+void blit_bitmap_frame(int x, int y, const bitmap_t* bitmap, int scale, const video_params_t* params) {
+	const uint8_t* src = (uint8_t*)bitmap->src;
 	unsigned char mask = *src;
 
 	const int x_i = x;
@@ -25,7 +27,7 @@ void blit_bitmap(int x, int y, bitmap_t* bitmap, int scale) {
 		char* framebuffer = params->framebuffer;
 		framebuffer += (size_t)(x * params->depth + y * params->pitch);
 
-		unsigned int color = (mask & 128) ? (~0) : (0xff0000);
+		video_color_t color = (mask & 128) ? blit_bitmap_fg : blit_bitmap_bg;
 
 		/* Avoid overdraw if scaled pixel goes just over border of screen */
 		int rem_pixels_y = params->height - y;
@@ -44,7 +46,7 @@ void blit_bitmap(int x, int y, bitmap_t* bitmap, int scale) {
 		mask <<= 1;
 
 		if (bits % 8 == 0) {
-			src--;
+			src++;
 			mask = *src;
 		}
 		if (bits % bitmap->width == 0) {
@@ -55,4 +57,9 @@ void blit_bitmap(int x, int y, bitmap_t* bitmap, int scale) {
 			x += scale;
 		}
 	}
+}
+
+void blit_bitmap(int x, int y, const bitmap_t* bitmap, int size) {
+	const video_params_t* params = video_get_params();
+	blit_bitmap_frame(x, y, bitmap, size, params);
 }

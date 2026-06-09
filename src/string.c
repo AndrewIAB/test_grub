@@ -28,10 +28,9 @@ const char* struint(unsigned int a) {
 
 const char* struint_hex(unsigned int a, int length) {
 	char* out = &(strtemp[sizeof(strtemp) - 1]);
-	int i;
 	strtemp[sizeof(strtemp) - 1] = 0;
 	
-	for (i = 0; i < length; i++) {
+	for (int i = 0; i < length; i++) {
 		register int b = a % 16;
 		out--;
 		if (b < 10) {
@@ -47,10 +46,9 @@ const char* struint_hex(unsigned int a, int length) {
 
 const char* struint_bin(unsigned int a, int length) {
 	char* out = &(strtemp[sizeof(strtemp) - 1]);
-	int i;
 	strtemp[sizeof(strtemp) - 1] = 0;
 	
-	for (i = 0; i < length; i++) {
+	for (int i = 0; i < length; i++) {
 		out--;
 		(*out) = '0' + (a % 2);
 		a /= 2;

@@ -4,6 +4,8 @@ SECTIONS
 {
 	. = 2M;
 
+	_kbin_beg = .;
+
 	.text ALIGN(4K):
 	{
 		KEEP(*(.multiboot))
@@ -14,6 +16,7 @@ SECTIONS
 	.rodata ALIGN(4K):
 	{
 		*(.rodata)
+		*(.rodata.*)
 	}
 
 	/* Read-write data (initialized) */
@@ -28,6 +31,8 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
+
+	_kbin_end = .;
 
 	.comment :
 	{

@@ -2,7 +2,7 @@ export PATH := $(PATH):/home/andrew/opt/cross/bin/
 CC:=i686-elf-gcc
 AS:=i686-elf-as
 
-CARGS:=-ffreestanding -nostdlib -fno-pic -std=c11 -pedantic -Wall -Wextra -O0
+CARGS:=-ffreestanding -nostdlib -fno-pic -std=gnu99 -Wall -Wextra -Ofast
 
 C_FILES:=$(wildcard src/*.c) $(wildcard src/**/*.c)
 C_NAMES:=$(patsubst src/%, %, $(basename $(C_FILES)))
@@ -12,8 +12,10 @@ DISK_SIZE := $(shell echo $$((512 * 1024 * 1024)))
 DD_BS := 4096
 DD_COUNT := $(shell expr $(DISK_SIZE) / $(DD_BS))
 
+BIN:=bin/kernel
+
 .PHONY: kernel
-kernel: bin/os
+kernel: $(BIN)
 
 .PHONY: all
 all: disk
@@ -43,7 +45,7 @@ tell:
 	@echo $(OBJ_FILES)
 	@pwd
 
-disk.img: bin/os grub.cfg
+disk.img: $(BIN) grub.cfg
 	rm diskloop -f
 	rm disk.img -f
 # Create mounting point
@@ -64,13 +66,13 @@ disk.img: bin/os grub.cfg
 	sudo grub-install --target=i386-pc --boot-directory=mnt/boot $$(cat diskloop)
 # Copy files into filesystem
 	sudo cp grub.cfg mnt/boot/grub
-	sudo cp bin/os mnt/boot
+	sudo cp $(BIN) mnt/boot
 # Cleanup
 	sudo umount mnt
 	sudo losetup -d $$(cat diskloop)
 	rm mnt -r
 
-bin/os: bin/boot.so $(OBJ_FILES)
+$(BIN): bin/boot.so $(OBJ_FILES)
 	$(CC) -T linker.ld -o $@ $^ $(CARGS) -Wl,--orphan-handling=error -lgcc
 
 bin/boot.so: boot.s

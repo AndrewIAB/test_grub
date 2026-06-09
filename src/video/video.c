@@ -4,6 +4,26 @@
 
 #include "video.h"
 
+static const video_palette_entry_t VGA_TTY_PALETTE[16] = {
+	{0x00, 0x00, 0x00},
+	{0x00, 0x00, 0xAA},
+	{0x00, 0xAA, 0x00},
+	{0x00, 0xAA, 0xAA},
+	{0xAA, 0x00, 0x00},
+	{0xAA, 0x00, 0xAA},
+	{0xAA, 0x55, 0x00},
+	{0xAA, 0xAA, 0xAA},
+	{0x55, 0x55, 0x55},
+	{0x55, 0x55, 0xFF},
+	{0x55, 0xFF, 0x55},
+	{0x55, 0xFF, 0xFF},
+	{0xFF, 0x55, 0x55},
+	{0xFF, 0x55, 0xFF},
+	{0xFF, 0xFF, 0x55},
+	{0xFF, 0xFF, 0xFF}
+
+};
+
 void* memcpy(void*, const void*, size_t);
 
 static video_params_t video_params;
@@ -28,6 +48,8 @@ void video_multiboot_init(const multiboot_info_t* multiboot_info) {
 		video_params.pitch = 160;
 		video_params.mode = VIDEO_MODE_TTY;
 		video_params.framebuffer = (void*)0xB8000;
+		video_params.palette_list.palette = VGA_TTY_PALETTE;
+		video_params.palette_list.len = 16;
 		return;
 	}
 
@@ -35,12 +57,12 @@ void video_multiboot_init(const multiboot_info_t* multiboot_info) {
 
 	switch (multiboot_info->framebuffer_type) {
 		case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
-			video_params.mode = VIDEO_MODE_BMP;
-			video_params.palette = (void*)multiboot_info->framebuffer_palette_addr;
-			video_params.palette_len = multiboot_info->framebuffer_palette_num_colors;
+			video_params.mode = VIDEO_MODE_INDEXED;
+			video_params.palette_list.palette = (void*)multiboot_info->framebuffer_palette_addr;
+			video_params.palette_list.len = multiboot_info->framebuffer_palette_num_colors;
 			break;
 		case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
-			video_params.mode = VIDEO_MODE_BMP;
+			video_params.mode = VIDEO_MODE_COLOR;
 			memcpy(
 				&video_params.color_mask,
 				&multiboot_info->framebuffer_red_field_position,
@@ -49,6 +71,8 @@ void video_multiboot_init(const multiboot_info_t* multiboot_info) {
 		
 		case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
 			video_params.mode = VIDEO_MODE_TTY;
+			video_params.palette_list.palette = VGA_TTY_PALETTE;
+			video_params.palette_list.len = 16;
 			break;
 	}
 

@@ -7,19 +7,18 @@
 
 /* Multiboot signiture for GRUB */
 .section .multiboot
-.align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
-.skip 24
+.int MAGIC
+.int FLAGS
+.int CHECKSUM
+.skip 20
 /* Graphics mode: 0 for linear, 1 for text */
-.long 0
+.int 0
 /* Width */
-.long 320
+.int 1280
 /* Height */
-.long 200
+.int 720
 /* Depth */
-.long 32
+.int 32
 
 /* Stack */
 .section .bss
