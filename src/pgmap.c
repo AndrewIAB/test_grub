@@ -5,9 +5,6 @@
 
 #include "multiboot.h"
 
-extern void* _kbin_beg;
-extern void* _kbin_end;
-
 #define MAX_PAGES (1 << 20)
 #define PAGE_BYTEBIT(PAGE)\
 	uint32_t byte = (PAGE) / 8, bit = (PAGE) % 8
@@ -52,7 +49,7 @@ pgindex_t pgmap_get_free() {
 		}
 	}
 	/* Return impossible page */
-	return UINT_MAX;
+	return ~0;
 }
 
 void* pgmap_alloc() {
