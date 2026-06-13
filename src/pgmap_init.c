@@ -7,7 +7,7 @@
 #define MAX(X, Y) ((X) < (Y) ? (Y) : (X))
 
 #define PAGE_SIZE ((uint32_t)4096)
-// (1<<32) - PAGE_SIZE
+/* (1<<32) - PAGE_SIZE */
 #define MAX_PAGE_ADDR ((uint32_t)0x3FFFFFFFFF000)
 
 extern void* _kbin_beg;
@@ -15,12 +15,12 @@ extern void* _kbin_end;
 
 extern uint8_t* pgmap_bfree;
 extern uint8_t* pgmap_breserved;
-void* pgmap_alloc();
-void pgmap_free(void*);
+
 void pgmap_reserve(void*);
 
 void* memset (void*, register int, register size_t);
 
+/* Check mmap for free regions WITHOUT page bitmap */
 static bool in_free_region(void* page_base, multiboot_memory_map_t* mmap_table, size_t mmap_table_len) {
 	for (size_t i = 0; i < mmap_table_len;) {
 		multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)((uint32_t)mmap_table + i);
@@ -37,6 +37,7 @@ static bool in_free_region(void* page_base, multiboot_memory_map_t* mmap_table, 
 	return false;
 }
 
+/* Check that page is not in the kernel binary or stack space */
 static bool in_os_space(void* page_base) {
 	return
 		page_base < _kbin_beg &&
@@ -44,6 +45,7 @@ static bool in_os_space(void* page_base) {
 		page_base > _kbin_end;
 }
 
+/* Check that page is not in a grub table */
 static bool in_grub_region(void* page_base, multiboot_info_t* multiboot_info) {
 	if (
 			(uint32_t)page_base >= (uint32_t)multiboot_info &&
@@ -60,12 +62,17 @@ static bool in_grub_region(void* page_base, multiboot_info_t* multiboot_info) {
 	return false;
 }
 
+/* Reserve a multiboot mmap region */
 static void reserve_region(multiboot_memory_map_t* mmap) {
 	for (uint32_t i = mmap->addr; i < mmap->addr + mmap->len; i += PAGE_SIZE) {
 		pgmap_reserve((void*)i);
 	}
 }
 
+/*
+ * Preset reserved pages
+ * NOTE: Expand when depending on additional grub tables.
+ */
 static void set_reserved_pages(
 		multiboot_info_t* multiboot_info,
 		multiboot_memory_map_t* mmap_table,
@@ -116,7 +123,7 @@ void pgmap_init(multiboot_info_t* multiboot_info) {
 
 	pgmap_bfree = (void*)~0;
 
-	// Find free regions to place pagemap pages
+	/* Find free regions to place page bitmaps */
 	for (uint32_t i = 0; i < (uint32_t)max_page; i += PAGE_SIZE) {
 		if (
 				(!in_free_region((void*)i, mmap_table, mmap_table_len)) ||
@@ -135,8 +142,14 @@ void pgmap_init(multiboot_info_t* multiboot_info) {
 		}
 	}
 
+	/*
+	 * Clear page bitmaps
+	 * Free clears to all ones, reserved clears to all zeros.
+	 * All pages free and unreserved :3
+	 */
 	memset(pgmap_bfree, ~0, PAGE_SIZE);
 	memset(pgmap_breserved, 0, PAGE_SIZE);
 
+	/* Nevermind reserve them now */
 	set_reserved_pages(multiboot_info, mmap_table, max_page);
 }

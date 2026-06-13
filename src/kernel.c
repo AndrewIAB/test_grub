@@ -7,13 +7,6 @@
 #include "video/bitmap_font.h"
 #include "debug_print.h"
 
-#define PAGE_SIZE ((uint32_t)4096)
-// (1<<32) - PAGE_SIZE
-#define MAX_PAGE_ADDR ((uint32_t)0x3FFFFFFFFF000)
-
-#define MAX(X, Y) ((X) < (Y) ? (Y) : (X))
-#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
-
 /* Low level IO */
 uint8_t inb(uint16_t);
 void outb(uint16_t, uint8_t);
@@ -25,22 +18,11 @@ const char* struint(unsigned int);
 const char* struint_bin(unsigned int, int);
 const char* struint_hex(unsigned int, int);
 
-void blit_bitmap(int x, int y, const bitmap_t* bitmap, int scale);
-extern video_color_t blit_bitmap_fg;
-extern video_color_t blit_bitmap_bg;
-
-extern void* _kbin_beg;
-extern void* _kbin_end;
-
-extern uint8_t* pgmap_bfree;
-extern uint8_t* pgmap_breserved;
 void* pgmap_alloc();
 void pgmap_free(void*);
 void pgmap_reserve(void*);
 
 void pgmap_init(multiboot_info_t*);
-
-void* memset (void*, register int, register size_t);
 
 void kernel_main(multiboot_info_t* multiboot_info, int magic_number) {
 	/* Check that bootloader is multiboot compliant */
@@ -48,6 +30,7 @@ void kernel_main(multiboot_info_t* multiboot_info, int magic_number) {
 		return;
 	}
 
+	/* Initiate these first for debug purposes */
 	video_multiboot_init(multiboot_info);
 	bitmap_font_init();
 	debug_print_init();
