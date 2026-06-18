@@ -48,7 +48,6 @@ video_color_t debug_print_bmp_bg;
 /* Detected color palette */
 video_color_t debug_print_bmp_colors[16];
 
-//int debug_print_bmp_spacing = 2;
 int debug_print_bmp_margin = 2;
 
 void (*debug_putchar)(char);
@@ -71,7 +70,7 @@ void debug_print_init() {
 		debug_print = debug_print_tty;
 	}
 	else {
-		debug_print_columns = params->width / (bitmap_font_width);
+		debug_print_columns = params->width / bitmap_font_width;
 		debug_print_rows = params->height / bitmap_font_height;
 
 		debug_putchar = debug_putchar_bmp;
@@ -97,25 +96,16 @@ void debug_print_set_color(uint8_t color) {
 	}
 }
 
-void debug_print_scroll_tty() {
-	const video_params_t* params = video_get_params();
-	memcpy(
-			params->framebuffer,
-			(char*)params->framebuffer + params->pitch,
-			params->pitch * (params->height - 1));
-	memset(
-			(char*)params->framebuffer + (params->height - 1) * params->pitch,
-			0,
-			params->pitch);
-	debug_print_index -= debug_print_columns;
-}
-
 void debug_ins_tty(char c) {
 	const video_params_t* params = video_get_params();
 	((uint16_t*)params->framebuffer)[debug_print_index] = (debug_print_tty_style << 8) | c;
 }
 
 void debug_putchar_tty(char c) {
+	if (debug_print_index > debug_print_columns * debug_print_rows) {
+		return;
+	}
+	
 	switch (c) {
 		case '\n':
 			debug_print_index -= debug_print_index % debug_print_columns;
@@ -132,10 +122,6 @@ void debug_putchar_tty(char c) {
 			debug_print_index ++;
 			break;
 	}
-
-	if (debug_print_index >= debug_print_columns * debug_print_rows) {
-		debug_print_scroll_tty();
-	}
 }
 
 void debug_print_tty(const char* str) {
@@ -143,19 +129,6 @@ void debug_print_tty(const char* str) {
 		debug_putchar_tty(*str);
 		str++;
 	}
-}
-
-void debug_print_scroll_bmp() {
-	const video_params_t* params = video_get_params();
-	memcpy(
-			params->framebuffer,
-			(char*)params->framebuffer + params->pitch * bitmap_font_height,
-			params->pitch * (params->height - bitmap_font_height));
-	memset(
-			(char*)params->framebuffer + (params->height - bitmap_font_height) * params->pitch,
-			0,
-			params->pitch * bitmap_font_height);
-	debug_print_index -= debug_print_columns;
 }
 
 void debug_ins_bmp(char c) {
@@ -167,6 +140,10 @@ void debug_ins_bmp(char c) {
 }
 
 void debug_putchar_bmp(char c) {
+	if (debug_print_index > debug_print_columns * debug_print_rows) {
+		return;
+	}
+
 	switch (c) {
 		case '\n':
 			debug_print_index -= debug_print_index % debug_print_columns;
@@ -182,10 +159,6 @@ void debug_putchar_bmp(char c) {
 			debug_ins_bmp(c);
 			debug_print_index ++;
 			break;
-	}
-
-	if (debug_print_index >= debug_print_columns * debug_print_rows) {
-		debug_print_scroll_bmp();
 	}
 }
 
