@@ -5,7 +5,7 @@
 #include "multiboot.h"
 #include "video/video.h"
 #include "video/bitmap_font.h"
-#include "debug_print.h"
+#include "debug/debug_print.h"
 #include "int/sysint.h"
 #include "int/intexcep.h"
 #include "panic/panic.h"

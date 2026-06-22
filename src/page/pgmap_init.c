@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "multiboot.h"
+#include "../multiboot.h"
 
 #define MAX(X, Y) ((X) < (Y) ? (Y) : (X))
 

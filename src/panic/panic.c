@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "debug_print.h"
+#include "../debug/debug_print.h"
 
 #define GRAB_REG(REG, VAR)\
 	__asm__ volatile (\

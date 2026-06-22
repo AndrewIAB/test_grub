@@ -2,9 +2,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "debug_print.h"
-#include "panic.h"
-#include "seg_offsets.h"
+#include "../debug/debug_print.h"
+#include "../panic/panic.h"
+#include "../seg_offsets.h"
 #include "sysint.h"
 #include "intexcep.h"
 
@@ -65,10 +65,15 @@ exception_handler(XF, false);
 exception_handler(VE, false);
 exception_handler(CP, true);
 exception_handler(RESERVED1, false);
+exception_handler(RESERVED2, false);
+exception_handler(RESERVED3, false);
+exception_handler(RESERVED4, false);
+exception_handler(RESERVED5, false);
+exception_handler(RESERVED6, false);
 exception_handler(HV, false);
 exception_handler(VC, true);
 exception_handler(SX, true);
-exception_handler(RESERVED2, false);
+exception_handler(RESERVED7, false);
 
 
 #define IDT_INT_GATE 0xE
@@ -119,9 +124,8 @@ void sysint_init_table() {
 	set_exception(RESERVED4);
 	set_exception(RESERVED5);
 	set_exception(RESERVED6);
-	set_exception(RESERVED7);
 	set_exception(HV);
 	set_exception(VC);
 	set_exception(SX);
-	set_exception(RESERVED8);
+	set_exception(RESERVED7);
 }

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <limits.h>
 
-#include "multiboot.h"
+#include "../multiboot.h"
 
 #define MAX_PAGES (1 << 20)
 #define PAGE_BYTEBIT(PAGE)\

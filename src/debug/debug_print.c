@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "video/video.h"
-#include "video/bitmap_font.h"
+#include "../video/video.h"
+#include "../video/bitmap_font.h"
 #include "debug_print.h"
 
 /*
