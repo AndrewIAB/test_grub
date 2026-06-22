@@ -48,8 +48,6 @@ video_color_t debug_print_bmp_bg;
 /* Detected color palette */
 video_color_t debug_print_bmp_colors[16];
 
-int debug_print_bmp_margin = 2;
-
 void (*debug_putchar)(char);
 void (*debug_print)(const char*);
 
@@ -132,8 +130,8 @@ void debug_print_tty(const char* str) {
 }
 
 void debug_ins_bmp(char c) {
-	int x = (debug_print_index % debug_print_columns) * (bitmap_font_width) + debug_print_bmp_margin;
-	int y = (debug_print_index / debug_print_columns) * bitmap_font_height + debug_print_bmp_margin;
+	int x = (debug_print_index % debug_print_columns) * (bitmap_font_width);
+	int y = (debug_print_index / debug_print_columns) * bitmap_font_height;
 	blit_bitmap_fg = debug_print_bmp_fg;
 	blit_bitmap_bg = debug_print_bmp_bg;
 	blit_bitmap(x, y, &(bitmap_font[*(uint8_t*)(&c)]), 1);
