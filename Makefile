@@ -2,7 +2,7 @@ export PATH := $(PATH):/home/andrew/opt/cross/bin/
 CC:=i686-elf-gcc
 AS:=i686-elf-as
 
-CARGS:=-ffreestanding -nostdlib -fno-pic -std=gnu99 -Wall -Wextra -Ofast
+CARGS:=-ffreestanding -nostdlib -fno-pic -std=gnu99 -Wall -Wextra -Ofast -g1
 
 C_FILES:=$(wildcard src/*.c) $(wildcard src/**/*.c)
 C_NAMES:=$(patsubst src/%, %, $(basename $(C_FILES)))
@@ -33,7 +33,7 @@ clean:
 
 .PHONY: test
 test:
-	qemu-system-i386 -drive file=disk.img,media=disk,format=raw -m 512M -device isa-vga
+	qemu-system-i386 -d int -drive file=disk.img,media=disk,format=raw -m 512M -device isa-vga
 
 .PHONY: run
 run: all test
@@ -73,7 +73,7 @@ disk.img: $(BIN) grub.cfg
 	rm mnt -r
 
 $(BIN): bin/boot.so $(OBJ_FILES)
-	$(CC) -T linker.ld -o $@ $^ $(CARGS) -Wl,--orphan-handling=error -lgcc
+	$(CC) -T linker.ld -o $@ $^ $(CARGS) -lgcc
 
 bin/boot.so: boot.s
 	$(AS) $< -o $@
