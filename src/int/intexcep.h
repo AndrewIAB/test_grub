@@ -1,0 +1,37 @@
+#pragma once
+
+enum {
+	INT_DE,
+	INT_DB,
+	INT_NMI, /* Non maskable interrupt */
+	INT_BP,
+	INT_OF,
+	INT_BR,
+	INT_UD,
+	INT_NM,
+	INT_DF,
+	INT_CSO, /* Coprocessor segment overrun */
+	INT_TS,
+	INT_NP,
+	INT_SS,
+	INT_GP,
+	INT_PF,
+	INT_RESERVED0,
+	INT_MF,
+	INT_AC,
+	INT_MC,
+	INT_XF,
+	INT_VE,
+	INT_CP,
+	INT_RESERVED1,
+	INT_RESERVED2,
+	INT_RESERVED3,
+	INT_RESERVED4,
+	INT_RESERVED5,
+	INT_RESERVED6,
+	INT_HV,
+	INT_VC,
+	INT_SX,
+	INT_RESERVED7
+};
+
