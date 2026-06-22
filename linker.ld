@@ -17,6 +17,12 @@ SECTIONS
 	{
 		*(.rodata)
 		*(.rodata.*)
+		_debug_line_beg = .;
+		*(.debug_line)
+		_debug_line_end = .;
+		_debug_str_beg = .;
+		*(.debug_str)
+		_debug_str_end = .;
 	}
 
 	/* Read-write data (initialized) */
@@ -33,33 +39,4 @@ SECTIONS
 	}
 
 	_kbin_end = .;
-
-	.comment :
-	{
-		*(.comment)
-	}
-
-	.rel :
-	{
-		*(.rel)
-		*(.rel.*)
-	}
-
-	.got :
-	{
-		*(.got)
-		*(.got.*)
-	}
-
-	.igot :
-	{
-		*(.igot)
-		*(.igot.*)
-	}
-
-	.iplt :
-	{
-		*(.iplt)
-		*(.iplt.*)
-	}
 }
